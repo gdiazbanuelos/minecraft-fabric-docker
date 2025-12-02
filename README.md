@@ -5,7 +5,7 @@ Requirements
 - Docker compose
 
 ```
-docker compose up -d --buid
+docker compose up -d --build
 ```
 ## Changing Fabric/Minecraft version
 Refer to official Fabric server: https://fabricmc.net/use/server/
