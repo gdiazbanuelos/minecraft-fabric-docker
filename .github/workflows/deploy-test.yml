@@ -1,0 +1,39 @@
+name: Run Server Deployment
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy Minecraft Server
+        run: |
+          docker compose -f compose.yml up -d --build
+      
+      - name: Wait 30 seconds
+        run: |
+          echo "Waiting 30 seconds for server to initialize..."
+          sleep 30
+
+      - name: Check if Minecraft server container is running
+        run: |
+          if docker ps -f "name=^/minecraft-fabric-server$" --format "{{.Names}}" | grep -q .; then
+            echo "Minecraft server is running!"
+          else
+            echo "Minecraft server is NOT running!"
+            docker ps -a
+            exit 1
+          fi
+
+      - name: Stop and remove all containers
+        if: ${{ always() }}
+        run: |
+          echo "Stopping all deployed containers..."
+          docker compose -f compose.yml down
